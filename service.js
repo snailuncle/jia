@@ -2,7 +2,6 @@
 let { JInit, JFlow, JWork, JConfig } = require('./jia/main')
 
 let config = require('./config')
-let common = require('./common')
 
 // uid: "96170903569",
 function extractDouYinWorkInfo (url) {
