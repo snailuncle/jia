@@ -52,8 +52,8 @@ let allowedProperties = [
 
 
 
-function widgetInspect (widgetList, searchWidgetLimitTime, workConfig) {
-  searchWidgetLimitTime = searchWidgetLimitTime || workConfig.work.default.searchWidgetLimitTime
+function widgetInspect (widgetList, workConfig) {
+  searchWidgetLimitTime = workConfig.searchWidgetLimitTime || workConfig.work.default.searchWidgetLimitTime
   if (!widgetList) {
     return true;
   }

@@ -16,13 +16,20 @@ function Flow (name, workList, workConfig) {
   this.name = name
   this.workList = workList
   this.workConfig = workConfig
+  this.store = {}
   var len = this.workList.length
   for (var i = 0; i < len; i++) {
     let workName = this.workList[i]
     if (!this.workConfig[workName]) {
+      log('workConfig中没有该工作配置: ' + workName)
+      log('当前workConfig = ')
+      log(this.workConfig)
       throw new Error('请对工作进行配置: ' + workName)
     }
   }
+}
+Flow.prototype.setWorkList = function (workList) {
+  this.workList = workList
 }
 
 Flow.prototype.go = function () {
@@ -39,9 +46,8 @@ Flow.prototype.go = function () {
     let workName = this.workList[i]
     this.workConfig[workName].work = this.workConfig.work
     let work = new Work(this.workConfig[workName])
-
     work.flow = this
-    let workResult;
+    let workResult = false;
     for (let j = 0; j < this.workConfig.work.default.retryCount; j++) {
       log('当前工作名字: ' + work.name + ': 第' + j + '次 执行 开始 ')
       let startTime = new Date().getTime()
@@ -50,37 +56,42 @@ Flow.prototype.go = function () {
       let that = this;
       let workThreadId = threads.start(
         function () {
-          try {
-            work.go()
-          } catch (e) {
-            log('当前工作名字: ' + workName + ', 发生异常:')
-            log(e)
-            if (e.message.indexOf('无障碍服务') > -1) {
-              log('是无障碍异常')
-              lib.关闭指定app的无障碍(that.workConfig.work.default.execAppName);
-              sleep(100)
-              lib.打开指定app的无障碍(that.workConfig.work.default.execAppName);
-              sleep(100)
-            } else {
-              log('不是无障碍异常')
-            }
-          }
+          // try {
+          work.go()
+          // } catch (e) {
+          //   log('当前工作名字: ' + workName + ', 发生异常:')
+          //   log(e)
+          //   if (e.message.indexOf('无障碍服务') > -1) {
+          //     log('是无障碍异常')
+          //     lib.关闭指定app的无障碍(that.workConfig.work.default.execAppName);
+          //     sleep(100)
+          //     lib.打开指定app的无障碍(that.workConfig.work.default.execAppName);
+          //     sleep(100)
+          //   } else {
+          //     log('不是无障碍异常')
+          //     log(e.stack)
+          //   }
+          // }
           endTime = new Date().getTime()
         }
       )
       while (spendTime < work.limitTime) {
         workResult = work.getResult()
         if (workResult) {
+          log('当前工作名字: ' + work.name + ': 工作完成: 跳出检测循环.')
           break;
         }
+
         endTime = new Date().getTime()
         spendTime = endTime - startTime
         sleep(this.workConfig.work.default.checkStateIntervalTime)
       }
+
       if (spendTime >= work.limitTime) {
         log('当前工作名字: ' + work.name + ': 第' + j + '次 执行 结束: 耗时: ' + (endTime - startTime) + 'ms, 工作结果: ' + workResult + ' : 已经超时 : 限制时间: ' + work.limitTime)
       }
       workThreadId && workThreadId.isAlive() && workThreadId.interrupt()
+      workResult = work.getResult()
       log('当前工作名字: ' + work.name + ': 第' + j + '次 执行 结束: 耗时: ' + (endTime - startTime) + 'ms, 工作结果: ' + workResult)
       if (workResult) {
         break;

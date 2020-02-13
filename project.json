@@ -1,7 +1,7 @@
 {
   "name": "helloworld",
   "main": "main.js",
-  "ignore": ["other", "node_modules", ".gitignore", "gitCommand.txt", "README.md", ".eslintrc"],
+  "ignore": ["other", "node_modules", ".gitignore", "gitCommand.txt", "README.md", ".eslintrc", "test"],
   "packageName": "com.jia.example",
   "versionName": "1.0.0",
   "versionCode": 1

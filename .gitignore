@@ -1,6 +1,7 @@
 
 gitCommand.txt
-other/
+test/
+other/test/
 /target/
 /.settings/
 .classpath
