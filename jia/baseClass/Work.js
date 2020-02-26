@@ -2,15 +2,14 @@
 // 正常工作是工作, 异常处理也是工作
 
 let widgetInspect = require('../lib/widgetInspect')
-let config = require('../config')
 function Work (workConfig) {
-  this.workConfig = Object.assign(config, workConfig);
-  this.name = this.workConfig.name || this.workConfig.work.default.name
-  this.limitTime = this.workConfig.limitTime || this.workConfig.work.default.limitTime  // 每个工作的限制时间
+  this.workConfig = workConfig;
+  this.name = this.workConfig.name
+  this.limitTime = this.workConfig.limitTime
   this.result = false;
-  this.action = this.workConfig.action || this.workConfig.work.default.action
-  this.handleException = this.workConfig.handleException || this.workConfig.work.default.handleException
-  this.expectedWidgetList = this.workConfig.expectedWidgetList || this.workConfig.work.default.expectedWidgetList
+  this.action = this.workConfig.action
+  this.handleException = this.workConfig.handleException
+  this.expectedWidgetList = this.workConfig.expectedWidgetList
   this.inspect = function () {
     if (this.expectedWidgetList) {
       return widgetInspect(this.expectedWidgetList, this.workConfig)
@@ -34,8 +33,7 @@ Work.prototype.setAction = function (action) {
 }
 
 
-Work.prototype.go = function () {
-  toast(this.name)
+Work.prototype.run = function () {
   log('当前工作名字: ' + this.name + ': 执行 开始')
   this.action()
   this.result = this.inspect()

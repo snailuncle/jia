@@ -1,4 +1,4 @@
-
+let config = require('../config')
 module.exports = {
   getObjType (obj) {
     // JavaScript 标准文档中定义: [[Class]] 的值只可能是下面字符串中的一个： Arguments, Array, Boolean, Date, Error, Function, JSON, Math, Number, Object, RegExp, String.
@@ -23,7 +23,7 @@ module.exports = {
   打开指定app的无障碍 (appName) {
     log(arguments.callee.name)
     if (!appName) {
-      throw new Error("没有传入参数 appName");
+      appName = config.work.default.execAppName
     }
     var packageName = getPackageName(appName);
     importClass(android.provider.Settings);
@@ -40,6 +40,7 @@ module.exports = {
     } catch (error) {
       //授权方法：开启usb调试并使用adb工具连接手机，执行 adb shell pm grant org.autojs.autojspro android.permission.WRITE_SECURE_SETTING
       log("\n请确保已给予 WRITE_SECURE_SETTINGS 权限\n\n授权代码已复制，请使用adb工具连接手机执行(重启不失效)\n\n", error);
+      log("adb shell pm grant " + packageName + " android.permission.WRITE_SECURE_SETTINGS")
       setClip("adb shell pm grant " + packageName + " android.permission.WRITE_SECURE_SETTINGS");
     }
     sleep(100)
@@ -47,7 +48,7 @@ module.exports = {
   关闭指定app的无障碍 (appName) {
     log(arguments.callee.name)
     if (!appName) {
-      throw new Error("没有传入参数 appName");
+      appName = config.work.default.execAppName
     }
     var packageName = getPackageName(appName);
     importClass(android.provider.Settings);
@@ -64,6 +65,7 @@ module.exports = {
     } catch (error) {
       //授权方法：开启usb调试并使用adb工具连接手机，执行 adb shell pm grant org.autojs.autojspro android.permission.WRITE_SECURE_SETTING
       log("\n请确保已给予 WRITE_SECURE_SETTINGS 权限\n\n授权代码已复制，请使用adb工具连接手机执行(重启不失效)\n\n", error);
+      log("adb shell pm grant " + packageName + " android.permission.WRITE_SECURE_SETTINGS")
       setClip("adb shell pm grant " + packageName + " android.permission.WRITE_SECURE_SETTINGS");
     }
     sleep(100)

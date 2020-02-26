@@ -53,7 +53,7 @@ let allowedProperties = [
 
 
 function widgetInspect (widgetList, workConfig) {
-  searchWidgetLimitTime = workConfig.searchWidgetLimitTime || workConfig.work.default.searchWidgetLimitTime
+  let searchWidgetLimitTime = workConfig.searchWidgetLimitTime
   if (!widgetList) {
     return true;
   }
@@ -65,7 +65,7 @@ function widgetInspect (widgetList, workConfig) {
       var widgetFindStatementList = []
       for (var i = 0; i < len; i++) {
         let widget = widgetList[i]
-        widgetFindStatement = ['selector()']
+        let widgetFindStatement = ['selector()']
         for (let k in widget) {
           if (allowedProperties.indexOf(k) > -1) {
             let v = widget[k]
@@ -112,7 +112,7 @@ function widgetInspect (widgetList, workConfig) {
         log('widgetFindStatement=')
         log(widgetFindStatement)
         var view = eval(widgetFindStatement)
-        if (view && workConfig.work.default.showView) {
+        if (view && workConfig.showView) {
           lib.showView(view)
         }
       }

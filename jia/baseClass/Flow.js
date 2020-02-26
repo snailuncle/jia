@@ -32,7 +32,7 @@ Flow.prototype.setWorkList = function (workList) {
   this.workList = workList
 }
 
-Flow.prototype.go = function () {
+Flow.prototype.run = function () {
   log('当前工作流程名字: ' + this.name + ': 执行 开始')
   this.startTime = new Date().getTime()
   this.workListSummary = []
@@ -44,11 +44,14 @@ Flow.prototype.go = function () {
   log('当前工作流程列表: ' + this.workListSummary.join(' --> '))
   for (let i = 0; i < len; i++) {
     let workName = this.workList[i]
-    this.workConfig[workName].work = this.workConfig.work
-    let work = new Work(this.workConfig[workName])
+    if (!this.workConfig[workName]) {
+      throw new Error('请在workConfig中对该工作: [' + workName + '] 进行配置')
+    }
+    let currentWorkConfig = Object.assign(this.workConfig.work.default, this.workConfig[workName]);
+    let work = new Work(currentWorkConfig)
     work.flow = this
     let workResult = false;
-    for (let j = 0; j < this.workConfig.work.default.retryCount; j++) {
+    for (let j = 0; j < currentWorkConfig.retryCount; j++) {
       log('当前工作名字: ' + work.name + ': 第' + j + '次 执行 开始 ')
       let startTime = new Date().getTime()
       let endTime;
@@ -57,15 +60,15 @@ Flow.prototype.go = function () {
       let workThreadId = threads.start(
         function () {
           // try {
-          work.go()
+          work.run()
           // } catch (e) {
           //   log('当前工作名字: ' + workName + ', 发生异常:')
           //   log(e)
           //   if (e.message.indexOf('无障碍服务') > -1) {
           //     log('是无障碍异常')
-          //     lib.关闭指定app的无障碍(that.workConfig.work.default.execAppName);
+          //     lib.关闭指定app的无障碍(currentWorkConfig.execAppName);
           //     sleep(100)
-          //     lib.打开指定app的无障碍(that.workConfig.work.default.execAppName);
+          //     lib.打开指定app的无障碍(currentWorkConfig.execAppName);
           //     sleep(100)
           //   } else {
           //     log('不是无障碍异常')
@@ -84,7 +87,7 @@ Flow.prototype.go = function () {
 
         endTime = new Date().getTime()
         spendTime = endTime - startTime
-        sleep(this.workConfig.work.default.checkStateIntervalTime)
+        sleep(currentWorkConfig.checkStateIntervalTime)
       }
 
       if (spendTime >= work.limitTime) {
